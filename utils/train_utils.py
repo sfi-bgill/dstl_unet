@@ -65,9 +65,11 @@ grid_sizes = pd.read_csv(os.path.join(data_dir, 'data/grid_sizes.csv'),
 x_crop = 3345
 y_crop = 3338
 
-test_names = ['6110_1_2', '6110_3_1', '6100_1_3', '6120_2_2']
+#test_names = ['6110_1_2', '6110_3_1', '6100_1_3', '6120_2_2']
+test_names = ['6120_2_2']
 #train_names = list(set(data_utils.all_train_names) - set(test_names))
-train_names = data_utils.all_train_names
+#train_names = data_utils.all_train_names
+train_names = ['6120_2_2']
 test_ids = [data_utils.train_IDs_dict_r[name] for name in test_names]
 train_ids = [data_utils.train_IDs_dict_r[name] for name in train_names]
 
@@ -87,7 +89,8 @@ def generate_train_ids(cl):
     df = df.fillna(0)
     df = df[df[data_utils.CLASSES[cl + 1]] != 0]
 
-    train_names = sorted(list(df.index.get_values()))
+    #train_names = sorted(list(df.index.get_values()))
+    train_names = ['6120_2_2']
 
     return [data_utils.train_IDs_dict_r[name] for name in train_names]
 
@@ -110,12 +113,18 @@ def get_all_data(img_ids, train = True):
 
         image_feature.append(image_data.train_feature[: x_crop, : y_crop, :])
         image_label.append(image_data.label[: x_crop, : y_crop, :])
-
-        sys.stdout.write('\rLoading {} data: [{}{}] {}%\n'.\
-                         format(phase,
-                                '=' * i,
-                                ' ' * (no_img - i - 1),
-                                100 * i / (no_img - 1)))
+        if no_img > 1:
+            sys.stdout.write('\rLoading {} data: [{}{}] {}%\n'.\
+                             format(phase,
+                                    '=' * i,
+                                    ' ' * (no_img - i - 1),
+                                    100 * i / (no_img - 1)))
+        else:
+            sys.stdout.write('\rLoading {} data: [{}{}] {}%\n'. \
+                             format(phase,
+                                    '=' * 1,
+                                    ' ' * 1,
+                                    100 * 1))
         sys.stdout.flush()
     sys.stdout.write('\n')
     image_feature = np.stack(image_feature, -1)

@@ -45,16 +45,21 @@ def test_input(img, img_size, H):
         [crop_width, img_width, 0, crop_height],
         [crop_width, img_width, crop_height, img_height],
     ]:
+    # for [x_start, x_end, y_start, y_end] in [
+    #     [0, crop_width, 0, crop_height]]:
+
         feature = img[x_start: x_end, y_start:y_end, :]
-        for feat_trans in [feature, np.rollaxis(feature, 1, 0)]:
-            for [x_step, y_step] in [[1, 1], [-1, 1], [1, -1], [-1, -1]]:
+        # for feat_trans in [feature, np.rollaxis(feature, 1, 0)]:
+        for feat_trans in [feature]:
+            # for [x_step, y_step] in [[1, 1], [-1, 1], [1, -1], [-1, -1]]:
+            for [x_step, y_step] in [[1, 1]]:
                 feature_w_padding = cv2.copyMakeBorder(
                     feat_trans[::x_step, ::y_step, :],
                     pad, x_width - pad - feat_trans.shape[0],
                     pad, x_height - pad - feat_trans.shape[1],
                     cv2.BORDER_REFLECT_101)
+                # yield feat_trans.shape, feat_trans
                 yield feat_trans.shape, feature_w_padding
-
 
 
 def pred_for_each_quarter(sess, img_in, pred, img_data, H):
@@ -96,21 +101,27 @@ def stitch_mask(img_stack, img_size, feat_shape, H):
     :param feat_shape:
     :return:
     '''
-    mask = np.zeros([8, img_size[0], img_size[1]])
+    # mask = np.zeros([8, img_size[0], img_size[1]])
+    mask = np.zeros([img_size[0], img_size[1]])
     [img_width, img_height] = img_size
     [crop_width, crop_height] = H['crop_size']
     pad = H['pad']
 
+    #quarter = 0
     idx = 0
+
     for [x_start, x_end, y_start, y_end] in [
         [0, crop_width, 0, crop_height],
         [0, crop_width, crop_height, img_height],
         [crop_width, img_width, 0, crop_height],
         [crop_width, img_width, crop_height, img_height],
     ]:
-        quarter = 0
-        for feat_trans in range(2):
-            for [x_step, y_step] in [[1, 1], [-1, 1], [1, -1], [-1, -1]]:
+    # for [x_start, x_end, y_start, y_end] in [
+    #     [0, crop_width, 0, crop_height]]:
+
+        for feat_trans in range(1):
+            # for [x_step, y_step] in [[1, 1], [-1, 1], [1, -1], [-1, -1]]:
+            for [x_step, y_step] in [[1, 1]]:
 
                 img_stack[idx] = img_stack[idx] \
                     [pad: pad + feat_shape[idx][0],
@@ -118,15 +129,27 @@ def stitch_mask(img_stack, img_size, feat_shape, H):
 
                 img_stack[idx] = img_stack[idx][::x_step, ::y_step]
 
-                if feat_trans == 1:
-                    img_stack[idx] = np.rollaxis(img_stack[idx], 1, 0)
+                # if feat_trans == 1:
+                #     img_stack[idx] = np.rollaxis(img_stack[idx], 1, 0)
 
-                mask[quarter, x_start: x_end, y_start: y_end] = img_stack[idx]
+                mask[x_start: x_end, y_start: y_end] = img_stack[idx]
 
-                quarter += 1
+                #quarter += 1
                 idx += 1
 
-    return np.squeeze((np.mean(mask, axis=0) > 0.5).astype(np.int))
+    print np.amax(mask)
+    print mask.shape
+    print np.sum(mask)
+    hist, bin_edges = np.histogram(mask.flatten())
+    print hist
+    print bin_edges
+    # for i in range(mask.shape[1]):
+    #     for j in range(mask.shape[2]):
+    #         if mask[0][i][j] == 1.0:
+    #             print i
+    #             print j
+    #             print "\n"
+    return np.squeeze((mask > 0.5).astype(np.int))
 
 
 
@@ -158,7 +181,7 @@ if __name__ == '__main__':
         [crop_width, crop_height] = H['crop_size']
 
     img_in = tf.placeholder(dtype=tf.float32,
-                            shape=[batch_size, x_width, x_height, 16])
+                            shape=[batch_size, x_width, x_height, num_channel])
     logits, pred = train.build_pred(img_in, H, 'test')
 
     sys.stdout.write('\n')

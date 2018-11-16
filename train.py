@@ -77,7 +77,7 @@ def build_pred(x_in, H, phase):
     with slim.arg_scope(argument_scope(H, phase)):
         scope_name = 'block_1'
         x_input = x_in
-        num_outputs = 64
+        num_outputs = 32
         with tf.variable_scope(scope_name, reuse=reuse):
             layer_1 = slim.conv2d(x_input, num_outputs, conv_kernel_3, scope='conv1')
             layer_2 = slim.conv2d(layer_1, num_outputs, conv_kernel_3, scope='conv2')
@@ -85,7 +85,7 @@ def build_pred(x_in, H, phase):
 
         scope_name = 'block_2'
         x_input = slim.max_pool2d(layer_2)
-        num_outputs = 128
+        num_outputs = 64
         with tf.variable_scope(scope_name, reuse=reuse):
             layer_1 = slim.conv2d(x_input, num_outputs, conv_kernel_3, scope='conv1')
             layer_2 = slim.conv2d(layer_1, num_outputs, conv_kernel_3, scope='conv2')
@@ -93,7 +93,7 @@ def build_pred(x_in, H, phase):
 
         scope_name = 'block_3'
         x_input = slim.max_pool2d(layer_2)
-        num_outputs = 256
+        num_outputs = 128
         with tf.variable_scope(scope_name, reuse=reuse):
             layer_1 = slim.conv2d(x_input, num_outputs, conv_kernel_3, scope='conv1')
             layer_2 = slim.conv2d(layer_1, num_outputs, conv_kernel_3, scope='conv2')
@@ -101,7 +101,7 @@ def build_pred(x_in, H, phase):
 
         scope_name = 'block_4'
         x_input = slim.max_pool2d(layer_2)
-        num_outputs = 512
+        num_outputs = 256
         with tf.variable_scope(scope_name, reuse=reuse):
             layer_1 = slim.conv2d(x_input, num_outputs, conv_kernel_3, scope='conv1')
             layer_2 = slim.conv2d(layer_1, num_outputs, conv_kernel_3, scope='conv2')
@@ -109,14 +109,14 @@ def build_pred(x_in, H, phase):
 
         scope_name = 'block_5'
         x_input = slim.max_pool2d(layer_2)
-        num_outputs = 1024
+        num_outputs = 512
         with tf.variable_scope(scope_name, reuse=reuse):
             layer_1 = slim.conv2d(x_input, num_outputs, conv_kernel_3, scope='conv1')
             layer_2 = slim.conv2d(layer_1, num_outputs, conv_kernel_3, scope='conv2')
             early_feature[scope_name] = layer_2
 
         scope_name = 'block_6'
-        num_outputs = 512
+        num_outputs = 256
         with tf.variable_scope(scope_name, reuse=reuse):
             trans_layer = slim.conv2d_transpose(
                 layer_2, num_outputs, pool_kernel, pool_stride, scope='conv_trans')
@@ -126,7 +126,7 @@ def build_pred(x_in, H, phase):
             early_feature[scope_name] = layer_2
 
         scope_name = 'block_7'
-        num_outputs = 256
+        num_outputs = 128
         with tf.variable_scope(scope_name, reuse=reuse):
             trans_layer = slim.conv2d_transpose(
                 layer_2, num_outputs, pool_kernel, pool_stride, scope='conv_trans')
@@ -136,7 +136,7 @@ def build_pred(x_in, H, phase):
             early_feature[scope_name] = layer_2
 
         scope_name = 'block_8'
-        num_outputs = 128
+        num_outputs = 64
         with tf.variable_scope(scope_name, reuse=reuse):
             trans_layer = slim.conv2d_transpose(
                 layer_2, num_outputs, pool_kernel, pool_stride, scope='conv_trans')
@@ -146,7 +146,7 @@ def build_pred(x_in, H, phase):
             early_feature[scope_name] = layer_2
 
         scope_name = 'block_9'
-        num_outputs = 64
+        num_outputs = 32
         with tf.variable_scope(scope_name, reuse=reuse):
             trans_layer = slim.conv2d_transpose(
                 layer_2, num_outputs, pool_kernel, pool_stride, scope='conv_trans')
@@ -360,9 +360,12 @@ if __name__ == '__main__':
     data_gen = {}
     for phase in ['train', 'validate']:
         is_train = {'train': True, 'validate': False}[phase]
+        # data_gen[phase] = train_utils.input_data(
+        #     crop_per_img=1, class_id=class_type, reflection=True,
+        #     rotation=360, train=is_train, crop_size=im_width)
         data_gen[phase] = train_utils.input_data(
-            crop_per_img=1, class_id=class_type, reflection=True,
-            rotation=360, train=is_train, crop_size=im_width)
+            crop_per_img=64, class_id=class_type, reflection=False,
+            rotation=1, train=is_train, crop_size=im_width)
         # Run the generator once to make sure the data is loaded into the memory
         # This will take a few minutes
         data_gen[phase].next()

@@ -674,9 +674,9 @@ class ImageData():
         '''
         return {
             '3': '{}/data/three_band/{}.tif'.format(data_dir, self.image_id),
-            'A': '{}/data/sixteen_band/{}_A.tif'.format(data_dir, self.image_id),
-            'M': '{}/data/sixteen_band/{}_M.tif'.format(data_dir, self.image_id),
-            'P': '{}/data/sixteen_band/{}_P.tif'.format(data_dir, self.image_id)
+            # 'A': '{}/data/sixteen_band/{}_A.tif'.format(data_dir, self.image_id),
+            # 'M': '{}/data/sixteen_band/{}_M.tif'.format(data_dir, self.image_id),
+            # 'P': '{}/data/sixteen_band/{}_P.tif'.format(data_dir, self.image_id)
         }
 
 
@@ -696,15 +696,15 @@ class ImageData():
                 images[key] = im
 
         im3 = images['3']
-        ima = images['A']
-        imm = images['M']
-        imp = images['P']
+        # ima = images['A']
+        # imm = images['M']
+        # imp = images['P']
 
         [nx, ny, _] = im3.shape
 
-        images['A'] = resize(ima, [nx, ny])
-        images['M'] = resize(imm, [nx, ny])
-        images['P'] = resize(imp, [nx, ny])
+        # images['A'] = resize(ima, [nx, ny])
+        # images['M'] = resize(imm, [nx, ny])
+        # images['P'] = resize(imp, [nx, ny])
 
         return images
 
@@ -718,28 +718,28 @@ class ImageData():
         images = self.read_image()
 
         im3 = images['3']
-        ima = images['A']
-        imm = images['M']
-        imp = images['P']
+        # ima = images['A']
+        # imm = images['M']
+        # imp = images['P']
 
-        imp = np.expand_dims(imp, 2)
-
-        [nx, ny, _] = im3.shape
-
-        warp_matrix_a = np.load(
-            (data_dir +
-             '/utils/image_alignment/{}_warp_matrix_a.npz').format(self.image_id)
-        )
-        warp_matrix_m = np.load(
-            (data_dir +
-             '/utils/image_alignment/{}_warp_matrix_m.npz').format(self.image_id)
-        )
-
-        ima = affine_transform(ima, warp_matrix_a, [nx, ny])
-        imm = affine_transform(imm, warp_matrix_m, [nx, ny])
-
-        im = np.concatenate((im3, ima, imm, imp), axis = -1)
-
+        # imp = np.expand_dims(imp, 2)
+        #
+        # [nx, ny, _] = im3.shape
+        #
+        # warp_matrix_a = np.load(
+        #     (data_dir +
+        #      '/utils/image_alignment/{}_warp_matrix_a.npz').format(self.image_id)
+        # )
+        # warp_matrix_m = np.load(
+        #     (data_dir +
+        #      '/utils/image_alignment/{}_warp_matrix_m.npz').format(self.image_id)
+        # )
+        #
+        # ima = affine_transform(ima, warp_matrix_a, [nx, ny])
+        # imm = affine_transform(imm, warp_matrix_m, [nx, ny])
+        #
+        # im = np.concatenate((im3, ima, imm, imp), axis = -1)
+        im=im3
         return im
 
 
@@ -770,38 +770,39 @@ class ImageData():
         if self.three_band_image is None:
             self.load_image()
 
-        m = self.sixteen_band_image[..., 8:].astype(np.float32)
+        # m = self.sixteen_band_image[..., 8:].astype(np.float32)
         rgb = self.three_band_image.astype(np.float32)
 
         image_r = rgb[..., 0]
         image_g = rgb[..., 1]
         image_b = rgb[..., 2]
 
-        nir = m[..., 7]
-        re = m[..., 5]
-
-        L, C1, C2 = 1.0, 6.0, 7.5
-
-        evi = np.nan_to_num(
-            (nir - image_r) / (nir + C1 * image_r - C2 * image_b + L))
-        evi = evi.clip(max=np.percentile(evi, 99), min=np.percentile(evi, 1))
-        evi = np.expand_dims(evi, 2)
-
-        ndwi = (image_g - nir) / (image_g + nir)
-        ndwi = np.expand_dims(ndwi, 2)
-
-        savi = (nir - image_r) / (image_r + nir)
-        savi = np.expand_dims(savi, 2)
-
-        # binary = (ccci > 0.11).astype(np.float32) marks water fairly well
-        ccci = np.nan_to_num(
-            (nir - re) / (nir + re) * (nir - image_r) / (nir + image_r))
-        ccci = ccci.clip(
-            max=np.percentile(ccci, 99.9),
-            min=np.percentile(ccci, 0.1))
-        ccci = np.expand_dims(ccci, 2)
-
-        feature = np.concatenate([m, rgb, evi, ndwi, savi, ccci], 2)
+        # nir = m[..., 7]
+        # re = m[..., 5]
+        #
+        # L, C1, C2 = 1.0, 6.0, 7.5
+        #
+        # evi = np.nan_to_num(
+        #     (nir - image_r) / (nir + C1 * image_r - C2 * image_b + L))
+        # evi = evi.clip(max=np.percentile(evi, 99), min=np.percentile(evi, 1))
+        # evi = np.expand_dims(evi, 2)
+        #
+        # ndwi = (image_g - nir) / (image_g + nir)
+        # ndwi = np.expand_dims(ndwi, 2)
+        #
+        # savi = (nir - image_r) / (image_r + nir)
+        # savi = np.expand_dims(savi, 2)
+        #
+        # # binary = (ccci > 0.11).astype(np.float32) marks water fairly well
+        # ccci = np.nan_to_num(
+        #     (nir - re) / (nir + re) * (nir - image_r) / (nir + image_r))
+        # ccci = ccci.clip(
+        #     max=np.percentile(ccci, 99.9),
+        #     min=np.percentile(ccci, 0.1))
+        # ccci = np.expand_dims(ccci, 2)
+        #
+        # feature = np.concatenate([m, rgb, evi, ndwi, savi, ccci], 2)
+        feature = rgb
         feature[feature == np.inf] = 0
         feature[feature == -np.inf] = 0
 
