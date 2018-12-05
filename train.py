@@ -204,6 +204,8 @@ def build_loss(x_in, y_in, H, phase):
             loss = tf.reduce_mean(
                 tf.nn.sigmoid_cross_entropy_with_logits(
                     labels=y_crop, logits=logits_crop))
+        loss = tf.Print(loss, [pred_crop[0, 0, 0], y_crop[0, 0, 0]], 'y_pred, y_true')
+        print pred_crop.shape, y_crop.shape
 
     elif H['loss_function'] == 'dice':
 
@@ -233,6 +235,8 @@ def build_loss(x_in, y_in, H, phase):
         jaccard_loss = - tf.log((intersection + tf.constant(epsilon)) / \
                                 (union + tf.constant(epsilon)))
         loss = cen_loss + jaccard_loss
+        loss = tf.Print(loss, [pred_crop[0, 0, 0], y_crop[0, 0, 0]], 'y_pred, y_true')
+        print pred_crop.shape, y_crop.shape
 
     elif H['loss_function'] == 'combo-dice':
         if apply_class_balancing:
@@ -364,14 +368,14 @@ if __name__ == '__main__':
         #     crop_per_img=1, class_id=class_type, reflection=True,
         #     rotation=360, train=is_train, crop_size=im_width)
         data_gen[phase] = train_utils.input_data(
-            crop_per_img=64, class_id=class_type, reflection=False,
+            crop_per_img=16, class_id=class_type, reflection=False,
             rotation=1, train=is_train, crop_size=im_width)
         # Run the generator once to make sure the data is loaded into the memory
         # This will take a few minutes
         data_gen[phase].next()
 
     sys.stdout.write('{} training images: {}\n'.format(
-        len(train_utils.train_names), train_utils.train_names))
+        len(train_utils.train_ids), train_utils.train_ids))
     sys.stdout.write('\n')
     sys.stdout.write('Training parameters: {}\n'.format(H))
     sys.stdout.write('\n')

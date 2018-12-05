@@ -58,7 +58,9 @@ def test_input(img, img_size, H):
                     pad, x_width - pad - feat_trans.shape[0],
                     pad, x_height - pad - feat_trans.shape[1],
                     cv2.BORDER_REFLECT_101)
-                # yield feat_trans.shape, feat_trans
+                print "feat_trans.shape"
+                print feat_trans.shape
+                # yield feat_trans.shape, feat_trans[::x_step, ::y_step, :]
                 yield feat_trans.shape, feature_w_padding
 
 
@@ -137,9 +139,9 @@ def stitch_mask(img_stack, img_size, feat_shape, H):
                 #quarter += 1
                 idx += 1
 
-    print np.amax(mask)
-    print mask.shape
-    print np.sum(mask)
+    # print np.amax(mask)
+    # print mask.shape
+    # print np.sum(mask)
     hist, bin_edges = np.histogram(mask.flatten())
     print hist
     print bin_edges

@@ -66,12 +66,16 @@ x_crop = 3345
 y_crop = 3338
 
 #test_names = ['6110_1_2', '6110_3_1', '6100_1_3', '6120_2_2']
-test_names = ['6120_2_2']
+#test_names = ['6120_2_2']
+# test_names = ['6040_1_3']
+test_names = ['6070_2_3']
 #train_names = list(set(data_utils.all_train_names) - set(test_names))
 #train_names = data_utils.all_train_names
-train_names = ['6120_2_2']
+#train_names = ['6120_2_2']
+train_names = ['6070_2_3']
 test_ids = [data_utils.train_IDs_dict_r[name] for name in test_names]
 train_ids = [data_utils.train_IDs_dict_r[name] for name in train_names]
+#train_ids = [8,10,11,12,13,14,15,16]
 
 
 # no_train_img = len(train_names)
@@ -90,7 +94,7 @@ def generate_train_ids(cl):
     df = df[df[data_utils.CLASSES[cl + 1]] != 0]
 
     #train_names = sorted(list(df.index.get_values()))
-    train_names = ['6120_2_2']
+    train_names = ['6070_2_3']
 
     return [data_utils.train_IDs_dict_r[name] for name in train_names]
 
