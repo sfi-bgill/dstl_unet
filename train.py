@@ -386,6 +386,7 @@ if __name__ == '__main__':
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
+    #config.operation_timeout_in_ms = 5000
     coord = tf.train.Coordinator()
     threads = {}
     saver = tf.train.Saver(max_to_keep=train_iter / save_iter + 1)
@@ -443,6 +444,8 @@ if __name__ == '__main__':
 
             if step % save_iter == 0 or step == (train_iter - 1):
                 saver.save(sess, ckpt_path, global_step=global_step.eval())
+        for phase in ['train', 'validate']:
+            sess.run(queues[phase].close(cancel_pending_enqueues=True))
 
     coord.request_stop()
     coord.join()
@@ -454,3 +457,4 @@ if __name__ == '__main__':
     sys.stdout.write('#' * 60 + '\n')
     sys.stdout.write('\n')
     sys.stdout.flush()
+

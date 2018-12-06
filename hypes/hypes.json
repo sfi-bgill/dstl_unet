@@ -15,7 +15,7 @@
     "norm_threshold": 1.0,
     "class_type" : 6,
     "apply_class_balancing" : false,
-    "train_iter": 9000,
+    "train_iter": 1,
     "lr" : 0.0001,
     "lr_decay_iter" : 4000,
     "epsilon" : 1.0
